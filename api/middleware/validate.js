@@ -28,6 +28,7 @@ export const validateRegister = [
     }
     return true;
   }),
+  body("secret").optional().trim(),
 ];
 
 export const validateLogin = [

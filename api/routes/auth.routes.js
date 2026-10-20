@@ -1,10 +1,31 @@
 import { Router } from "express";
-import { register, login } from "../controllers/auth.controller.js";
+import passport from "passport";
+import {
+  register,
+  login,
+  whoAmI,
+  whoAuthorAmI,
+  refresh,
+  logout,
+} from "../controllers/auth.controller.js";
+import "../config/passport.js";
 
-const auth = Router();
+const authRouter = Router();
 
-auth.post("/register", register);
+authRouter.post("/register", register);
 
-auth.post("/login", login);
+authRouter.post("/login", login);
 
-export default auth;
+authRouter.post("/logout", logout);
+
+authRouter.post("/refresh", refresh);
+
+authRouter.get("/me", passport.authenticate("jwt", { session: false }), whoAmI);
+
+authRouter.get(
+  "/author/me",
+  passport.authenticate("jwt", { session: false }),
+  whoAuthorAmI,
+);
+
+export default authRouter;

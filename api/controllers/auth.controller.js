@@ -32,7 +32,7 @@ export const register = [
           },
         });
       } else {
-        return res.status(400).json({ message: "Failed to sign up as author" });
+        return res.status(400).json([{ msg: "Failed to sign up as author" }]);
       }
     } else {
       createdUser = await prisma.user.create({
@@ -85,13 +85,13 @@ export const login = [
     });
 
     if (!user) {
-      return res.status(401).json("Invalid username or password");
+      return res.status(401).json([{ msg: "Invalid username or password" }]);
     }
 
     const match = await bcrypt.compare(loginData.password, user.password);
 
     if (!match) {
-      return res.status(401).json("Invalid username or password");
+      return res.status(401).json([{ msg: "Invalid username or password" }]);
     }
 
     const { accessToken, refreshToken } = generateTokens(user);
@@ -126,7 +126,7 @@ export const logout = [
     try {
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
-        return res.json({ message: "Already logged out" });
+        return res.json([{ msg: "Already logged out" }]);
       }
 
       res.clearCookie("refreshToken", {
@@ -140,9 +140,9 @@ export const logout = [
           hash: hashToken(refreshToken),
         },
       });
-      return res.json({ message: "Logged out" });
+      return res.json([{ msg: "Logged out" }]);
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json([{ msg: "Internal server error" }]);
     }
   },
 ];
@@ -152,7 +152,7 @@ export const refresh = [
     try {
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json([{ msg: "Unauthorized" }]);
       }
       const userRefreshToken = await prisma.refreshToken.findFirst({
         where: {
@@ -176,14 +176,14 @@ export const refresh = [
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
         });
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json([{ msg: "Unauthorized" }]);
       }
 
       const newAccessToken = generateAccessToken(userRefreshToken.user);
 
       return res.json({ accessToken: newAccessToken });
     } catch {
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json([{ msg: "Internal server error" }]);
     }
   },
 ];

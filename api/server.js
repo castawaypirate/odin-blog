@@ -22,11 +22,11 @@ server.use(cookieParser());
 server.use(authRouter);
 
 server.use((req, res, next) => {
-  return res.status(404).json({ message: "Where are you going, bruh?" });
+  return res.status(404).json([{ msg: "Where are you going, bruh?" }]);
 });
 
 server.use((err, req, res, next) => {
-  return res.status(500).json({ message: "Something went very wrung, bruh!" });
+  return res.status(500).json([{ msg: "Something went very wrung, bruh!" }]);
 });
 
 server.listen(port, (error) => {

@@ -2,8 +2,8 @@ import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 
 export default function Home() {
-  const [user, setUser, accessToken, setAccessToken] = useContext(AuthContext);
-  console.log(user);
+  // const [user, setUser, accessToken, setAccessToken] = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   return (
     <>

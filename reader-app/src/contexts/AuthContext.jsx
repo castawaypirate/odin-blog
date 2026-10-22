@@ -1,68 +1,129 @@
-import { createContext, useEffect } from "react";
-import { useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [accessToken, setAccessToken] = useState();
-  const [user, setUser] = useState({});
+  // const [accessToken, setAccessToken] = useState();
+  let accessTokenRef = useRef(null);
+  const [user, setUser] = useState(null);
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessTokenRef.current}`,
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const result = await response.text();
+        console.log(result);
+      } else {
+        const result = await response.json();
+        console.log(result);
+        setUser(result);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  async function refresh() {
+    try {
+      const response = await fetch("http://localhost:8000/refresh", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        // const result = await response.json();
+        return false;
+      } else {
+        const result = await response.json();
+        // setAccessToken(result.accessToken);
+        accessTokenRef.current = result.accessToken;
+        return true;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  const login = async (formData, setErrors) => {
+    try {
+      const response = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        setErrors(result);
+        return false;
+      } else {
+        const result = await response.json();
+        // setAccessToken(result.accessToken);
+        accessTokenRef.current = result.accessToken;
+        return true;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     // const controller = new AbortController();
-
-    async function fetchUser() {
-      try {
-        const response = await fetch("http://localhost:8000/me", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          const result = await response.json();
-          console.error(result);
-        } else {
-          const result = await response.json();
-          setUser(result);
+    async function init() {
+      if (accessTokenRef.current) {
+        await fetchUser();
+      } else {
+        if (await refresh()) {
+          await fetchUser();
         }
-      } catch (err) {
-        console.error(err);
       }
     }
-
-    async function refresh() {
-      try {
-        const response = await fetch("http://localhost:8000/refresh", {
-          method: "POST",
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          const result = await response.json();
-          console.error(result);
-        } else {
-          const result = await response.json();
-          setAccessToken(result.accessToken);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    if (accessToken) {
-      fetchUser();
-    } else {
-      refresh();
-    }
+    init();
     // return () => controller.abort();
-  }, [accessToken]);
+  }, []);
+
+  // async function getCurrentUser() {
+  //     if (accessTokenRef.current) {
+  //       try {
+  //         const response = await fetch("http://localhost:8000/me", {
+  //           method: "GET",
+  //           headers: {
+  //             Authorization: `Bearer ${accessTokenRef.current}`,
+  //           },
+  //           credentials: "include",
+  //         });
+  //
+  //         if (!response.ok) {
+  //           const result = await response.json();
+  //           console.error(result);
+  //         } else {
+  //           const result = await response.json();
+  //           setUser(result);
+  //         }
+  //       } catch (err) {
+  //         console.error(err);
+  //       }
+  //     }
+  //   }
 
   return (
-    <AuthContext value={[user, setUser, accessToken, setAccessToken]}>
+    // <AuthContext value={[user, setUser, accessToken, setAccessToken]}>
+    //   {children}
+    // </AuthContext>
+
+    <AuthContext value={{ user, setUser, accessTokenRef, login, fetchUser }}>
       {children}
     </AuthContext>
   );

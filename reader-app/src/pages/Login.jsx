@@ -1,10 +1,10 @@
-import { useContext } from "react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { useNavigate } from "react-router";
 
 export default function Login() {
-  const [accessToken, setAccessToken] = useContext(AuthContext);
+  // const [accessToken, setAccessToken] = useContext(AuthContext);
+  let { login, fetchUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -20,27 +20,9 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:8000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const result = await response.json();
-        console.error(result);
-        setErrors(result);
-      } else {
-        const result = await response.json();
-        setAccessToken(result.accessToken);
-        navigate("/", { replace: true });
-      }
-    } catch (err) {
-      console.error(err);
+    if (await login(formData, setErrors)) {
+      await fetchUser();
+      navigate("/", { replace: true });
     }
   };
 

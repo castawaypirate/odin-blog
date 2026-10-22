@@ -44,6 +44,9 @@ export const AuthProvider = ({ children }) => {
         return false;
       } else {
         const result = await response.json();
+        if (!result.accessToken) {
+          return false;
+        }
         // setAccessToken(result.accessToken);
         accessTokenRef.current = result.accessToken;
         return true;

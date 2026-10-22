@@ -14,6 +14,8 @@
 # targets
 - [19/10] login/register endpoints (without refresh tokens)
 - [20/10] refresh tokens
+- [21/10] login page + fetch request
+- [22/10] preserve state after login
 
 # takeaways
 - [19/10]:
@@ -29,4 +31,3 @@
     - clearCookie to delete with the above information but without the maxAge
     - gte to compare dates or values inside prisma query
     - middleware functions that need extra parameter need a wrapper function (if you do test(req, res, next) while you are adding it as middleware it will call itself and break where the wrapper function test(parameter) it will call itself and return a function and that function will function as the middleware)
-    - 

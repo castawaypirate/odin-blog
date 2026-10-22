@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext, useEffect } from "react";
 import { useState } from "react";
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -6,9 +6,65 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState();
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    // const controller = new AbortController();
+
+    async function fetchUser() {
+      try {
+        const response = await fetch("http://localhost:8000/me", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          const result = await response.json();
+          console.error(result);
+        } else {
+          const result = await response.json();
+          setUser(result);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function refresh() {
+      try {
+        const response = await fetch("http://localhost:8000/refresh", {
+          method: "POST",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          const result = await response.json();
+          console.error(result);
+        } else {
+          const result = await response.json();
+          setAccessToken(result.accessToken);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (accessToken) {
+      fetchUser();
+    } else {
+      refresh();
+    }
+    // return () => controller.abort();
+  }, [accessToken]);
 
   return (
-    <AuthContext value={[accessToken, setAccessToken]}>{children}</AuthContext>
+    <AuthContext value={[user, setUser, accessToken, setAccessToken]}>
+      {children}
+    </AuthContext>
   );
 };
 

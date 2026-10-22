@@ -1,9 +1,11 @@
 import { useContext } from "react";
 import { useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import { useNavigate } from "react-router";
 
 export default function Login() {
   const [accessToken, setAccessToken] = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -35,6 +37,7 @@ export default function Login() {
       } else {
         const result = await response.json();
         setAccessToken(result.accessToken);
+        navigate("/", { replace: true });
       }
     } catch (err) {
       console.error(err);

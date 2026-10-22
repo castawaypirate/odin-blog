@@ -152,7 +152,7 @@ export const refresh = [
     try {
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
-        return res.status(401).json([{ msg: "Unauthorized" }]);
+        return res.status(200).json([{ msg: "No active session" }]);
       }
       const userRefreshToken = await prisma.refreshToken.findFirst({
         where: {

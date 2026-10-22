@@ -82,6 +82,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const logout = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/logout", {
+        headers: {
+          Authorization: `Bearer ${accessTokenRef.current}`,
+        },
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        return false;
+      } else {
+        const result = await response.json();
+        console.log(result);
+        accessTokenRef.current = null;
+        setUser(null);
+        return true;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     // const controller = new AbortController();
     async function init() {
@@ -126,7 +150,7 @@ export const AuthProvider = ({ children }) => {
     //   {children}
     // </AuthContext>
 
-    <AuthContext value={{ user, setUser, accessTokenRef, login, fetchUser }}>
+    <AuthContext value={{ user, fetchUser, login, logout }}>
       {children}
     </AuthContext>
   );

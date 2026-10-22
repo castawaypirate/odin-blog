@@ -1,6 +1,19 @@
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 
 export default function NavBar() {
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    if (await logout()) {
+      navigate("/", { replace: true });
+      return;
+    }
+    alert("Something went wrong");
+  };
+
   return (
     <nav>
       <div>
@@ -8,8 +21,14 @@ export default function NavBar() {
       </div>
 
       <div>
-        <NavLink to="/login">Login</NavLink>
-        <NavLink to="/register">Register</NavLink>
+        {user ? (
+          <NavLink onClick={handleLogout}>Logout</NavLink>
+        ) : (
+          <>
+            <NavLink to="/login">Login</NavLink>
+            <NavLink to="/register">Register</NavLink>
+          </>
+        )}
       </div>
     </nav>
   );

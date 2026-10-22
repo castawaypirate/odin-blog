@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 
 export default function Login() {
   // const [accessToken, setAccessToken] = useContext(AuthContext);
-  let { login, fetchUser } = useContext(AuthContext);
+  const { login, fetchUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({

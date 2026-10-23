@@ -1,4 +1,6 @@
 # backlog
+- loading elements while fetching
+- logout reader app
 - login/register pages for author and reader apps 
 - cron job to clean up the expired refresh tokens
 - don't forget helmet and rateLimit (for some reason)
@@ -15,7 +17,7 @@
 - [19/10] login/register endpoints (without refresh tokens)
 - [20/10] refresh tokens
 - [21/10] login page + fetch request
-- [22/10] preserve state after login
+- [22/10] preserve state after login + logout
 
 # takeaways
 - [19/10]:
@@ -31,3 +33,11 @@
     - clearCookie to delete with the above information but without the maxAge
     - gte to compare dates or values inside prisma query
     - middleware functions that need extra parameter need a wrapper function (if you do test(req, res, next) while you are adding it as middleware it will call itself and break where the wrapper function test(parameter) it will call itself and return a function and that function will function as the middleware)
+- [21/10]:
+    - Loaders and middleware run outside React, so they can’t use useContext. Three approaches came out of that: A, everything in React (chosen); B, the router fetches the user; C, a hybrid with a ref plus a wrapper. Fetch instead of axios is fine, you just write the wrapper yourself
+- [22/10]:
+    - use ref for token because ui never displays them
+    - export functions from context, import them inside pages/components and use them - they will update the variables stored in state (this is the current pattern we use now)
+    - {{value}} to pass context variables and functions to children but it is bad for performance because it creates a new object every new re-render
+    - makes no difference to put ref variable in dependency array because the reference in memory stays the same during re-renders
+    - to logout just put an onClick on the NavLink of logout

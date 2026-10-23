@@ -1,4 +1,5 @@
 import { createContext, useEffect, useRef, useState } from "react";
+import authService from "../services/authService";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext();
@@ -10,13 +11,19 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch("http://localhost:8000/me", {
-        method: "GET",
+      // const response = await fetch("http://localhost:8000/me", {
+      //   method: "GET",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${accessTokenRef.current}`,
+      //   },
+      //   credentials: "include",
+      // });
+
+      const response = await authService.getUser({
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${accessTokenRef.current}`,
         },
-        credentials: "include",
       });
 
       if (!response.ok) {
@@ -34,10 +41,12 @@ export const AuthProvider = ({ children }) => {
 
   async function refresh() {
     try {
-      const response = await fetch("http://localhost:8000/refresh", {
-        method: "POST",
-        credentials: "include",
-      });
+      // const response = await fetch("http://localhost:8000/refresh", {
+      //   method: "POST",
+      //   credentials: "include",
+      // });
+
+      const response = await authService.refresh();
 
       if (!response.ok) {
         // const result = await response.json();
@@ -58,14 +67,16 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (formData, setErrors) => {
     try {
-      const response = await fetch("http://localhost:8000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
+      // const response = await fetch("http://localhost:8000/login", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   credentials: "include",
+      //   body: JSON.stringify(formData),
+      // });
+
+      const response = await authService.login(formData);
 
       if (!response.ok) {
         const result = await response.json();
@@ -83,27 +94,35 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    let success = false;
     try {
-      const response = await fetch("http://localhost:8000/logout", {
+      // const response = await fetch("http://localhost:8000/logout", {
+      //   headers: {
+      //     Authorization: `Bearer ${accessTokenRef.current}`,
+      //   },
+      //   method: "POST",
+      //   credentials: "include",
+      // });
+
+      const response = await authService.logout({
         headers: {
           Authorization: `Bearer ${accessTokenRef.current}`,
         },
-        method: "POST",
-        credentials: "include",
       });
 
-      if (!response.ok) {
-        return false;
-      } else {
+      success = response.ok;
+
+      if (success) {
         const result = await response.json();
         console.log(result);
-        accessTokenRef.current = null;
-        setUser(null);
-        return true;
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      accessTokenRef.current = null;
+      setUser(null);
     }
+    return success;
   };
 
   useEffect(() => {

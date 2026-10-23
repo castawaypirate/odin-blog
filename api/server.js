@@ -26,6 +26,7 @@ server.use((req, res, next) => {
 });
 
 server.use((err, req, res, next) => {
+  console.error(err);
   return res.status(500).json([{ msg: "Something went very wrung, bruh!" }]);
 });
 

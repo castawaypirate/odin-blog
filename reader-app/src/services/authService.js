@@ -6,6 +6,11 @@ class AuthService {
     return response;
   }
 
+  register(credentials) {
+    const response = apiService.post("/register", credentials);
+    return response;
+  }
+
   logout(options) {
     const response = apiService.post("/logout", null, options);
     return response;

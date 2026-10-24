@@ -114,18 +114,21 @@ export const AuthProvider = ({ children }) => {
 
       if (!response.ok) {
         // const result = await response.json();
-        return false;
+        return { status: response.status };
       } else {
         const result = await response.json();
         if (!result.accessToken) {
-          return false;
+          return { status: 500 };
         }
         // setAccessToken(result.accessToken);
         accessTokenRef.current = result.accessToken;
-        return true;
+        return { status: 200 };
       }
     } catch (err) {
       console.error(err);
+      return { status: 500 };
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -149,6 +152,24 @@ export const AuthProvider = ({ children }) => {
       } else {
         const result = await response.json();
         // setAccessToken(result.accessToken);
+        accessTokenRef.current = result.accessToken;
+        return true;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const register = async (formData, setErrors) => {
+    try {
+      const response = await authService.register(formData);
+
+      if (!response.ok) {
+        const result = await response.json();
+        setErrors(result);
+        return false;
+      } else {
+        const result = await response.json();
         accessTokenRef.current = result.accessToken;
         return true;
       }

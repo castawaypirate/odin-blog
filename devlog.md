@@ -1,13 +1,17 @@
 # backlog
-- loading elements while fetching
-- logout reader app
 - login/register pages for author and reader apps 
+- loading elements while fetching
+- author's comment carries a badge
+- post will have three states drafts, review, published ... so drafts will be only for the owner, review will be displayed to authors in reader app (maybe leave different kind of comments there) and published for all
 - cron job to clean up the expired refresh tokens
 - don't forget helmet and rateLimit (for some reason)
 - refresh token rotation + revoked field for refresh tokens (optional)
 - session id (meaning refresh token id) in the access token, checked per request (optional)
+- ask agent what did I not implement about refresh token
 
 # done
+- refresh token wrapper frontend
+- logout reader app
 - logout
 - refresh token
 - login/register endpoints + passport-jwt
@@ -18,6 +22,8 @@
 - [20/10] refresh tokens
 - [21/10] login page + fetch request
 - [22/10] preserve state after login + logout
+- [28/10] apiService abstraction layer
+- [29/10] refresh token wrapper frontend
 
 # takeaways
 - [19/10]:
@@ -41,3 +47,6 @@
     - {{value}} to pass context variables and functions to children but it is bad for performance because it creates a new object every new re-render
     - makes no difference to put ref variable in dependency array because the reference in memory stays the same during re-renders
     - to logout just put an onClick on the NavLink of logout
+- [28/10]:
+    - we need a wrapper function to do retries with the refresh token if the user gets 401
+    - we have 3 cases 200, 401 and 500 - only in 401 we setUser(null)

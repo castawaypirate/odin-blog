@@ -40,7 +40,7 @@ class ApiService {
   }
 
   get(endpoint, options = {}) {
-    return this.request(endpoint, { ...options });
+    return this.request(endpoint, options);
   }
 
   post(endpoint, data, options = {}) {

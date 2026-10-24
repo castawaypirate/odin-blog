@@ -1,34 +1,65 @@
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import authService from "../services/authService";
 
+const AuthContext = createContext();
+
 // eslint-disable-next-line react-refresh/only-export-components
-export const AuthContext = createContext();
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+
+  const { user, fetchUser, login, register, logout, loading } = context;
+
+  // const isAuthorized = (requireRole) => {
+  //   return user && user.role === requireRole;
+  // }
+
+  return { user, fetchUser, login, register, logout, loading };
+};
 
 export const AuthProvider = ({ children }) => {
   // const [accessToken, setAccessToken] = useState();
   let accessTokenRef = useRef(null);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  async function withRetry(doRequest) {
+    const response = await doRequest();
+    if (response.status !== 401) return response;
+    const refreshResponse = await refresh();
+    if (refreshResponse.status === 401) {
+      setUser(null);
+      return { ok: false, refreshResponse };
+    } else if (refreshResponse.status === 500) {
+      return { ok: false, refreshResponse };
+    } else {
+      return doRequest();
+    }
+  }
 
   const fetchUser = async () => {
     try {
-      // const response = await fetch("http://localhost:8000/me", {
-      //   method: "GET",
+      setLoading(true);
+      // const response = await authService.getUser({
       //   headers: {
-      //     "Content-Type": "application/json",
       //     Authorization: `Bearer ${accessTokenRef.current}`,
       //   },
-      //   credentials: "include",
       // });
 
-      const response = await authService.getUser({
-        headers: {
-          Authorization: `Bearer ${accessTokenRef.current}`,
-        },
-      });
+      const response = await withRetry(() =>
+        authService.getUser({
+          headers: {
+            Authorization: `Bearer ${accessTokenRef.current}`,
+          },
+        }),
+      );
 
       if (!response.ok) {
-        const result = await response.text();
-        console.log(result);
+        // const result = await response.text();
+        // console.log(result);
+        console.log(response);
       } else {
         const result = await response.json();
         console.log(result);
@@ -36,8 +67,41 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
+
+  // const fetchUser = async () => {
+  //   try {
+  //     // const response = await fetch("http://localhost:8000/me", {
+  //     //   method: "GET",
+  //     //   headers: {
+  //     //     "Content-Type": "application/json",
+  //     //     Authorization: `Bearer ${accessTokenRef.current}`,
+  //     //   },
+  //     //   credentials: "include",
+  //     // });
+  //
+  //     const response = await authService.getUser({
+  //       headers: {
+  //         Authorization: `Bearer ${accessTokenRef.current}`,
+  //       },
+  //     });
+  //
+  //     if (!response.ok) {
+  //       const result = await response.text();
+  //       console.log(result);
+  //       setUser(null);
+  //     } else {
+  //       const result = await response.json();
+  //       console.log(result);
+  //       setUser(result);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
   async function refresh() {
     try {

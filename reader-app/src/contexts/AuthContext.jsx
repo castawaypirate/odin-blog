@@ -216,7 +216,9 @@ export const AuthProvider = ({ children }) => {
       if (accessTokenRef.current) {
         await fetchUser();
       } else {
-        if (await refresh()) {
+        // we need this to not get 401 on page load/reload
+        const refreshResponse = await refresh();
+        if (refreshResponse.status === 200) {
           await fetchUser();
         }
       }

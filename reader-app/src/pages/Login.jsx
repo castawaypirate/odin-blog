@@ -1,10 +1,13 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+import { useState } from "react";
+// import { useContext, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+// import { AuthContext, useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router";
 
 export default function Login() {
   // const [accessToken, setAccessToken] = useContext(AuthContext);
-  const { login, fetchUser } = useContext(AuthContext);
+  // const { login, fetchUser } = useContext(AuthContext);
+  const { login, fetchUser } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({

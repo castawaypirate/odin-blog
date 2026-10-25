@@ -1,6 +1,7 @@
 class ApiService {
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_BASE_URL;
+    // this.baseURL = import.meta.env.VITE_API_BASE_URL;
+    this.baseURL = "/api";
   }
 
   async request(endpoint, options = {}) {

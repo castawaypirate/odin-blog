@@ -12,11 +12,11 @@ export const useAuth = () => {
 
   const { user, fetchUser, login, register, logout, loading } = context;
 
-  // const isAuthorized = (requireRole) => {
-  //   return user && user.role === requireRole;
-  // }
+  const isAuthorized = (requireRole) => {
+    return user && user.role === requireRole;
+  };
 
-  return { user, fetchUser, login, register, logout, loading };
+  return { user, fetchUser, login, register, logout, loading, isAuthorized };
 };
 
 export const AuthProvider = ({ children }) => {

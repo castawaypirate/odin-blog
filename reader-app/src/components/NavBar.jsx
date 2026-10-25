@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function NavBar() {
   // const { user, logout } = useContext(AuthContext);
-  const { user, logout, loading } = useAuth();
+  const { user, logout, loading, isAuthorized } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -20,6 +20,13 @@ export default function NavBar() {
     <nav>
       <div>
         <NavLink to="/">Posts</NavLink>
+        {loading ? (
+          <></>
+        ) : (
+          <>
+            {isAuthorized("Author") && <NavLink to="/review">Review</NavLink>}
+          </>
+        )}
       </div>
 
       <div>

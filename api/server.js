@@ -9,9 +9,13 @@ const port = process.env.PORT || 8000;
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim())
+  : [];
+
 server.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: [allowedOrigins],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),
@@ -19,7 +23,8 @@ server.use(
 
 server.use(cookieParser());
 
-server.use(authRouter);
+server.use("/api", authRouter);
+// server.use(authRouter);
 
 server.use((req, res, next) => {
   return res.status(404).json([{ msg: "Where are you going, bruh?" }]);

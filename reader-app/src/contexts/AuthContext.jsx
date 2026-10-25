@@ -227,36 +227,12 @@ export const AuthProvider = ({ children }) => {
     // return () => controller.abort();
   }, []);
 
-  // async function getCurrentUser() {
-  //     if (accessTokenRef.current) {
-  //       try {
-  //         const response = await fetch("http://localhost:8000/me", {
-  //           method: "GET",
-  //           headers: {
-  //             Authorization: `Bearer ${accessTokenRef.current}`,
-  //           },
-  //           credentials: "include",
-  //         });
-  //
-  //         if (!response.ok) {
-  //           const result = await response.json();
-  //           console.error(result);
-  //         } else {
-  //           const result = await response.json();
-  //           setUser(result);
-  //         }
-  //       } catch (err) {
-  //         console.error(err);
-  //       }
-  //     }
-  //   }
-
   return (
     // <AuthContext value={[user, setUser, accessToken, setAccessToken]}>
     //   {children}
     // </AuthContext>
 
-    <AuthContext value={{ user, fetchUser, login, logout }}>
+    <AuthContext value={{ user, fetchUser, login, register, logout, loading }}>
       {children}
     </AuthContext>
   );

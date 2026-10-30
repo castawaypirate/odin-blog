@@ -51,6 +51,7 @@ ACCESS_TOKEN_EXPIRY=1m
 REFRESH_TOKEN_EXPIRY=10d
 
 AUTHOR_SECRET=your_author_secret
+AUTHOR_PARAM=your_author_param
 ```
 
 ### 5) Run

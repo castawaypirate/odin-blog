@@ -1,16 +1,42 @@
-# React + Vite
+# Reader App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Vite + React 19 app for the blog reader (with user accounts, login/register, route guards).
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### 1) Scaffold
+```bash
+npm create vite@latest reader-app -- --template react
+cd reader-app
+npm install
+```
 
-## React Compiler
+### 2) Install dependencies
+```bash
+npm install react-router
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 3) Environment variables (optional)
+If you want to use `VITE_API_BASE_URL`, create `.env` in `reader-app/`:
+```env
+VITE_API_BASE_URL=/api
+```
 
-## Expanding the ESLint configuration
+Currently the app uses `/api` as the base URL (via `apiService`) and relies on the Vite dev proxy for local development.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 4) Run
+```bash
+npm run dev
+```
+
+App runs on `http://localhost:3000`. In development, `/api` requests are proxied to `http://localhost:8000` (see `vite.config.js`).
+
+## Scripts
+```json
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "lint": "eslint .",
+  "preview": "vite preview"
+  }
+```

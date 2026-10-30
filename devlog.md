@@ -1,15 +1,21 @@
 # backlog
 - login/register pages for author and reader apps 
-- loading elements while fetching
+- create post
+- author dashboard (view/edit/delete for each post)
+- edit post (in edit mode you can change the state of the post)
 - author's comment carries a badge
 - post will have three states drafts, review, published ... so drafts will be only for the owner, review will be displayed to authors in reader app (maybe leave different kind of comments there) and published for all
 - cron job to clean up the expired refresh tokens
+
 - don't forget helmet and rateLimit (for some reason)
+- ask agent what did I not implement about refresh token (maybe this was about rotation)
+
 - refresh token rotation + revoked field for refresh tokens (optional)
 - session id (meaning refresh token id) in the access token, checked per request (optional)
-- ask agent what did I not implement about refresh token
+- refresh endpoint call for author app should check if user is author (optional)
 
 # done
+- loading elements while fetching (kinda done)
 - refresh token wrapper frontend
 - logout reader app
 - logout
@@ -24,6 +30,7 @@
 - [22/10] preserve state after login + logout
 - [28/10] apiService abstraction layer
 - [29/10] refresh token wrapper frontend
+- [30/10] author create post, author dashboard (dashboard has all types of posts)
 
 # takeaways
 - [19/10]:
@@ -50,3 +57,14 @@
 - [28/10]:
     - we need a wrapper function to do retries with the refresh token if the user gets 401
     - we have 3 cases 200, 401 and 500 - only in 401 we setUser(null)
+- [29/10]:
+    - wrapper function takes inner function as parameter, execute it once, sees status and then refreshes or returns execution result - after one refresh you return the status from refresh or you execute function again and return result
+    - refresh retries have 3 outcomes - one success you return the request result, one 401 you log out the user and one 500 or something went wrong where you do nothing
+    - also the wrapper function takes as argument a arrow function and call the wrapper function to wrap the request line and not the whole login for example
+    - loading state implementation in my case is a state variable living the in component that gets the results of the requests - before executing the request you set it to true and at the end of the request no matter the result you set it to false - then you can inject it inside components and render things with an if
+    - for guards create extra components, inject the user state and <Navigate to="" /> based on conditions - then wrap the components in the routes.jsx
+    - you can set vite proxy in th vite.config.js to make the requests to target - broswer hits the_site/api then vite backend sees that api is a rule under proxy and sends the request to target set under api rule - then because of the changeOrigin changes the request's host header to target so backend sees that the request comes from the same origin - that way you can bypass cors (but better do not unset it in the server) - also this is for development and also by using this you don't need .env files for the base api url
+    - vite proxy is for dev only - production needs other configurations
+    - the browser enforces cors but the server is the one that sets the policy
+    - based on the request some what a preflight and some not - if the preflight is rejected the actual request never leaves the broswer
+

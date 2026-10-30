@@ -5,7 +5,8 @@ export default function PublicOnlyRoute({ children }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <h1>Loading...</h1>;
+    // return <h1>Loading...</h1>;
+    return <></>;
   }
 
   if (user) {

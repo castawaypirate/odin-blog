@@ -5,7 +5,8 @@ export default function AuthorRoute({ children }) {
   const { user, loading, isAuthorized } = useAuth();
 
   if (loading) {
-    return <h1>Loading...</h1>;
+    // return <h1>Loading...</h1>;
+    return <></>;
   }
 
   if (!user || !isAuthorized("Author")) {

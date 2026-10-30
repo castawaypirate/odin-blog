@@ -34,4 +34,5 @@ export const validateRegister = [
 export const validateLogin = [
   body("username").trim().notEmpty().withMessage("Username cannot be empty"),
   body("password").notEmpty().withMessage("Password cannot be empty"),
+  body("requireRole").optional().trim(),
 ];

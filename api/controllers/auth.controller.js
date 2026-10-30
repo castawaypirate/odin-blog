@@ -32,7 +32,7 @@ export const register = [
           },
         });
       } else {
-        return res.status(400).json([{ msg: "Failed to sign up as author" }]);
+        return res.status(400).json([{ msg: "Wrong secret" }]);
       }
     } else {
       createdUser = await prisma.user.create({
@@ -80,11 +80,20 @@ export const login = [
     }
 
     const loginData = matchedData(req);
+
     const user = await prisma.user.findUnique({
       where: { username: loginData.username },
     });
 
     if (!user) {
+      return res.status(401).json([{ msg: "Invalid username or password" }]);
+    }
+
+    if (
+      loginData.requireRole &&
+      loginData.requireRole === process.env.AUTHOR_PARAM &&
+      user.role !== "Author"
+    ) {
       return res.status(401).json([{ msg: "Invalid username or password" }]);
     }
 

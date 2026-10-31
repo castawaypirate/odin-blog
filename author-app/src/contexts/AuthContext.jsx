@@ -10,13 +10,30 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within an AuthProvider");
   }
 
-  const { user, fetchAuthor, login, register, logout, loading } = context;
+  const {
+    user,
+    fetchAuthor,
+    login,
+    register,
+    logout,
+    loading,
+    accessTokenRef,
+  } = context;
 
   const isAuthorized = (requireRole) => {
     return user && user.role === requireRole;
   };
 
-  return { user, fetchAuthor, login, register, logout, loading, isAuthorized };
+  return {
+    user,
+    fetchAuthor,
+    login,
+    register,
+    logout,
+    loading,
+    accessTokenRef,
+    isAuthorized,
+  };
 };
 
 export const AuthProvider = ({ children }) => {
@@ -164,7 +181,15 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext
-      value={{ user, fetchAuthor, login, register, logout, loading }}
+      value={{
+        user,
+        fetchAuthor,
+        login,
+        register,
+        logout,
+        loading,
+        accessTokenRef,
+      }}
     >
       {children}
     </AuthContext>

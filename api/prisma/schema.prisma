@@ -17,12 +17,19 @@ enum UserRole {
   Author
 }
 
+enum PostState {
+  Draft
+  Review
+  Publish
+}
+
 model User {
   id            String         @id @default(uuid())
   username      String         @unique
   password      String
   role          UserRole
   refreshTokens RefreshToken[]
+  posts         Post[]
 
   @@map("users")
 }
@@ -37,4 +44,18 @@ model RefreshToken {
   userId    String   @map("user_id")
 
   @@map("refresh_tokens")
+}
+
+model Post {
+  id          String    @id @default(uuid())
+  title       String
+  body        String
+  state       PostState
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  publishedAt DateTime? @map("published_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String    @map("user_id")
+
+  @@map("posts")
 }

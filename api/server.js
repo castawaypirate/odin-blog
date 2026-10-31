@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/auth.routes.js";
+import postsRouter from "./routes/posts.routes.js";
 
 const server = express();
 const port = process.env.PORT || 8000;
@@ -25,6 +26,7 @@ server.use(cookieParser());
 
 server.use("/api", authRouter);
 // server.use(authRouter);
+server.use("/api", postsRouter);
 
 server.use((req, res, next) => {
   return res.status(404).json([{ msg: "Where are you going, bruh?" }]);

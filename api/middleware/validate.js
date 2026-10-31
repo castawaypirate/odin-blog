@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { prisma } from "../lib/prisma.js";
 
 export const validateRegister = [
@@ -35,4 +35,17 @@ export const validateLogin = [
   body("username").trim().notEmpty().withMessage("Username cannot be empty"),
   body("password").notEmpty().withMessage("Password cannot be empty"),
   body("requireRole").optional().trim(),
+];
+
+export const validatePost = [
+  body("title").trim().notEmpty().withMessage("Title cannot be empty"),
+  body("body").notEmpty().withMessage("Body cannot be empty"),
+  body("state")
+    .notEmpty()
+    .withMessage("State cannot be empty")
+    .isIn(["Draft", "Review", "Publish"]),
+];
+
+export const validatePostId = [
+  param("id").isUUID().withMessage("Invalid post id"),
 ];

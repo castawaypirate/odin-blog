@@ -13,6 +13,7 @@
 - refresh token rotation + revoked field for refresh tokens (optional)
 - session id (meaning refresh token id) in the access token, checked per request (optional)
 - refresh endpoint call for author app should check if user is author (optional)
+- react app that uses context inside loaders and can hit authorized endpoints with access token in the loader level (optional)
 
 # done
 - loading elements while fetching (kinda done)
@@ -30,7 +31,8 @@
 - [22/10] preserve state after login + logout
 - [28/10] apiService abstraction layer
 - [29/10] refresh token wrapper frontend
-- [30/10] author create post, author dashboard (dashboard has all types of posts)
+- [30/10] author app protected routes + register author + posts endpoints
+- [31/10] author create post, author dashboard (dashboard has all types of posts)
 
 # takeaways
 - [19/10]:
@@ -67,4 +69,8 @@
     - vite proxy is for dev only - production needs other configurations
     - the browser enforces cors but the server is the one that sets the policy
     - based on the request some what a preflight and some not - if the preflight is rejected the actual request never leaves the broswer
+- [30/10]:
+    - token stored in React ref can intercept by XSS attack (wrapping fetch, call /refresh, digging into React internals) - the reason this approach is used is that access token is short-lived - real defence against XSS attacks is React itself (dangerouslySetInnerHTML, DOMPurify, CSP header) - although is still better than localstorage
+    - attackers can manipulate the login request from the author app to the api and receive a valid access token for a user role user - same can happen with creating a different endpoint - except client side guards (which is not defence it is just ui) the only other way to secure the application is to guard author endpoints
+    - useEffect on component init can cause race conditions that's why you need to use AbortController or and ignore flag
 

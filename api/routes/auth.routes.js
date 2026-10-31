@@ -1,5 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
+import "../config/passport.js";
 import {
   register,
   login,
@@ -8,7 +9,6 @@ import {
   refresh,
   logout,
 } from "../controllers/auth.controller.js";
-import "../config/passport.js";
 
 const authRouter = Router();
 

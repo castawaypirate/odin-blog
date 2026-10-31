@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import authService from "../services/authService";
 
 const AuthContext = createContext();
@@ -10,15 +17,8 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within an AuthProvider");
   }
 
-  const {
-    user,
-    fetchAuthor,
-    login,
-    register,
-    logout,
-    loading,
-    accessTokenRef,
-  } = context;
+  const { user, fetchAuthor, login, register, logout, loading, withRetry } =
+    context;
 
   const isAuthorized = (requireRole) => {
     return user && user.role === requireRole;
@@ -31,8 +31,8 @@ export const useAuth = () => {
     register,
     logout,
     loading,
-    accessTokenRef,
     isAuthorized,
+    withRetry,
   };
 };
 
@@ -41,47 +41,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  async function withRetry(doRequest) {
-    const response = await doRequest();
-    if (response.status !== 401) return response;
-    const refreshResponse = await refresh();
-    if (refreshResponse.status === 401) {
-      setUser(null);
-      return { ok: false, refreshResponse };
-    } else if (refreshResponse.status === 500) {
-      return { ok: false, refreshResponse };
-    } else {
-      return doRequest();
-    }
-  }
-
-  const fetchAuthor = async () => {
-    try {
-      setLoading(true);
-
-      const response = await withRetry(() =>
-        authService.getAuthor({
-          headers: {
-            Authorization: `Bearer ${accessTokenRef.current}`,
-          },
-        }),
-      );
-
-      if (!response.ok) {
-        console.log(response);
-      } else {
-        const result = await response.json();
-        console.log(result);
-        setUser(result);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  async function refresh() {
+  const refresh = useCallback(async () => {
     try {
       const response = await authService.refresh();
 
@@ -101,7 +61,56 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  const withRetry = useCallback(
+    async (doRequest) => {
+      const response = await doRequest({
+        headers: {
+          Authorization: `Bearer ${accessTokenRef.current}`,
+        },
+      });
+      if (response.status !== 401) return response;
+
+      const refreshResponse = await refresh();
+      if (refreshResponse.status === 401) {
+        setUser(null);
+        accessTokenRef.current = null;
+        return { ok: false, refreshResponse };
+      } else if (refreshResponse.status === 500) {
+        return { ok: false, refreshResponse };
+      } else {
+        return await doRequest({
+          headers: {
+            Authorization: `Bearer ${accessTokenRef.current}`,
+          },
+        });
+      }
+    },
+    [refresh],
+  );
+
+  const fetchAuthor = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const response = await withRetry((options) =>
+        authService.getAuthor(options),
+      );
+
+      if (!response.ok) {
+        console.log(response);
+      } else {
+        const result = await response.json();
+        console.log(result);
+        setUser(result);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [withRetry]);
 
   const login = async (formData, setErrors) => {
     try {
@@ -177,7 +186,7 @@ export const AuthProvider = ({ children }) => {
       }
     }
     init();
-  }, []);
+  }, [fetchAuthor, refresh]);
 
   return (
     <AuthContext
@@ -188,7 +197,7 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         loading,
-        accessTokenRef,
+        withRetry,
       }}
     >
       {children}

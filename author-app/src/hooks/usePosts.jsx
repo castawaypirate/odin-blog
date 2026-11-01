@@ -1,32 +1,33 @@
-import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import postsService from "../services/postsService";
 import { useCallback } from "react";
 
 export function usePosts() {
   const { withRetry } = useAuth();
-  // const [posts, setPosts] = useState(null);
 
-  const getAuthorPosts = useCallback(async () => {
-    try {
-      const response = await withRetry((options) =>
-        postsService.getAuthorPosts(options),
-      );
+  const getAuthorPosts = useCallback(
+    async (signal) => {
+      try {
+        const response = await withRetry(
+          (options) => postsService.getAuthorPosts({ ...options, signal }),
+          // postsService.getAuthorPosts({ ...options }),
+        );
 
-      if (!response.ok) {
-        console.log("getAuthorPosts");
-        console.log(response);
-        return response;
-      } else {
-        const result = await response.json();
-        // console.log(result);
-        // setPosts(result);
-        return result;
+        if (response.ok) {
+          const result = await response.json();
+          return { ok: true, posts: result };
+        }
+
+        const status = response.status ?? response.refreshResponse.status;
+        return { ok: false, status };
+      } catch (err) {
+        if (err.name === "AbortError") return { ok: false, aborted: true };
+        console.error(err);
+        return { ok: false, status: 500 };
       }
-    } catch (err) {
-      console.error(err);
-    }
-  }, [withRetry]);
+    },
+    [withRetry],
+  );
 
   return { getAuthorPosts };
 }

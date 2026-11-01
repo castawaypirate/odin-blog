@@ -1,5 +1,4 @@
 # backlog
-- login/register pages for author and reader apps 
 - create post
 - author dashboard (view/edit/delete for each post)
 - edit post (in edit mode you can change the state of the post)
@@ -16,6 +15,7 @@
 - react app that uses context inside loaders and can hit authorized endpoints with access token in the loader level (optional)
 
 # done
+- login/register pages for author and reader apps 
 - loading elements while fetching (kinda done)
 - refresh token wrapper frontend
 - logout reader app
@@ -23,6 +23,11 @@
 - refresh token
 - login/register endpoints + passport-jwt
 
+
+# planned
+- [for the next time]: 
+    - [6/11]
+    - [31/10] just finished custom hook to fetch posts display them and create form next I think 
 
 # targets
 - [19/10] login/register endpoints (without refresh tokens)
@@ -32,7 +37,8 @@
 - [28/10] apiService abstraction layer
 - [29/10] refresh token wrapper frontend
 - [30/10] author app protected routes + register author + posts endpoints
-- [31/10] author create post, author dashboard (dashboard has all types of posts)
+- [31/10] custom hook fetch all posts 
+- [31/10] author create post
 
 # takeaways
 - [19/10]:
@@ -73,4 +79,12 @@
     - token stored in React ref can intercept by XSS attack (wrapping fetch, call /refresh, digging into React internals) - the reason this approach is used is that access token is short-lived - real defence against XSS attacks is React itself (dangerouslySetInnerHTML, DOMPurify, CSP header) - although is still better than localstorage
     - attackers can manipulate the login request from the author app to the api and receive a valid access token for a user role user - same can happen with creating a different endpoint - except client side guards (which is not defence it is just ui) the only other way to secure the application is to guard author endpoints
     - useEffect on component init can cause race conditions that's why you need to use AbortController or and ignore flag
+- [31/10]:
+    - instead of sending access token in every request we had to use withRetry function in order for the whole refresh flow to be applied correctly
+    - if withRetry refresh returns 401 user and token are removed and because user state was changed AuthContext was re-rendered, so after this guards could catch that see no user in state an redirect the user to login
+    - we had a 6 logs were printed on page reload situation which was because React at first mounts components for starters without run useEffect (two times because of strict mode), then useEffect ran two times (strict mode) and useEffect called custom hook two times which changed state so we had two more renders so two more prints
+    - use await where you need to wait and use what is returned from somewhere - you don't have to use async/await throughout the whole chain of functions
+    - functions called inside a useEffect that are in its dependency array and are not using useCallback will trigger effects to re-run - useCallback keeps the same function reference
+    - useCallback refresh dependency array is empty because it the function implementation doesn't use state variable - module level import (authService), ref and state setters don't have to be included in the dependency array
+    - when you use useCallback you got to respect the chain of functions, so it must be used when a function is in the dependency array of another useCallback
 

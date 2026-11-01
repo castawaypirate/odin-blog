@@ -1,35 +1,57 @@
 import { useEffect, useState } from "react";
-import postsService from "../services/postsService";
-import { useAuth } from "../contexts/AuthContext";
 import { usePosts } from "../hooks/usePosts";
+import { useRef } from "react";
 
 export default function Dashboard() {
   const { getAuthorPosts } = usePosts();
-  const [posts, setPosts] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [error, setError] = useState(null);
+  const controller = useRef(null);
 
   useEffect(() => {
-    async function test() {
-      const res = await getAuthorPosts();
-      setPosts(res);
+    controller.current = new AbortController();
+    const signal = controller.current.signal;
+
+    async function getPosts() {
+      const res = await getAuthorPosts(signal);
+      if (res.aborted) return;
+      if (res.ok) {
+        setPosts([...res.posts]);
+      } else {
+        setError(new Error("Failed to load posts"));
+      }
     }
-    test();
+    getPosts();
+
+    return () => {
+      controller.current.abort();
+    };
   }, [getAuthorPosts]);
 
-  // const { posts } = usePosts();
-  // console.log(posts);
-  // const { fetchAuthor } = useAuth();
-  // useEffect(() => {
-  //   async function test() {
-  //     try {
-  //       await fetchAuthor();
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-  //   test();
-  // }, []);
+  console.log(posts);
 
-  return <>Dashboard</>;
+  if (error) throw error;
+
+  return (
+    <>
+      <h1>Author posts</h1>
+      <div>
+        {posts?.length > 0 ? (
+          posts.map((post) => (
+            <div key={post.id}>
+              <div>{post.title}</div>
+              <div>{post.body}</div>
+              <div>{post.state}</div>
+              <div>{post.createdAt}</div>
+              <div>{post.updatedAt}</div>
+            </div>
+          ))
+        ) : (
+          <div>No posts yet</div>
+        )}
+      </div>
+    </>
+  );
 }
 
 // const [data, loading, error] = useFetch("/author/posts");

@@ -37,7 +37,7 @@ model User {
 model RefreshToken {
   id        String   @id @default(uuid())
   hash      String   @unique
-  createAt  DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   expiresAt DateTime @map("expires_at")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

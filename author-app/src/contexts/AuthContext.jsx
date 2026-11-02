@@ -46,18 +46,18 @@ export const AuthProvider = ({ children }) => {
       const response = await authService.refresh();
 
       if (!response.ok) {
-        return { status: response.status };
+        return { status: response.status, msg: "Something went wrong" };
       } else {
         const result = await response.json();
         if (!result.accessToken) {
-          return { status: 500 };
+          return { status: 500, msg: "Internal server error" };
         }
         accessTokenRef.current = result.accessToken;
         return { status: 200 };
       }
     } catch (err) {
       console.error(err);
-      return { status: 500 };
+      return { status: 500, msg: "Internal server error" };
     } finally {
       setLoading(false);
     }
@@ -102,7 +102,6 @@ export const AuthProvider = ({ children }) => {
         console.log(response);
       } else {
         const result = await response.json();
-        console.log(result);
         setUser(result);
       }
     } catch (err) {
@@ -123,7 +122,6 @@ export const AuthProvider = ({ children }) => {
         return false;
       } else {
         const result = await response.json();
-        // setAccessToken(result.accessToken);
         accessTokenRef.current = result.accessToken;
         return true;
       }

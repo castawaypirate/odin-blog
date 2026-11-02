@@ -34,7 +34,7 @@ class ApiService {
   put(endpoint, data, options = {}) {
     return this.request(endpoint, {
       method: "PUT",
-      body: JSON.stringify(data),
+      body: data ? JSON.stringify(data) : null,
       ...options,
     });
   }

@@ -22,6 +22,7 @@ export default function Login() {
     if (await login(formData, setErrors)) {
       await fetchAuthor();
       navigate("/", { replace: true });
+      return;
     }
     setFormData({ username: formData.username, password: "" });
   };

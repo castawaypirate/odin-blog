@@ -1,13 +1,18 @@
 # backlog
-- create post
 - author dashboard (view/edit/delete for each post)
+- filters in author dashboard to show posts with specific state or states
+- search in both dashboards
 - edit post (in edit mode you can change the state of the post)
-- author's comment carries a badge
 - post will have three states drafts, review, published ... so drafts will be only for the owner, review will be displayed to authors in reader app (maybe leave different kind of comments there) and published for all
+- author's comment carries a badge
+- comments (feedback) in review are shown only to authors in review page
+- reviewed button which can be pressed by authors to indicate that they reviewed the post - unreviewed posts in review page are styled differently - after author edits the post and updates review counter is zeroed and the post is shown again in review as unreviewed
+- comments on publish
 - cron job to clean up the expired refresh tokens
 
 - don't forget helmet and rateLimit (for some reason)
 - ask agent what did I not implement about refresh token (maybe this was about rotation)
+- styles
 
 - refresh token rotation + revoked field for refresh tokens (optional)
 - session id (meaning refresh token id) in the access token, checked per request (optional)
@@ -15,6 +20,7 @@
 - react app that uses context inside loaders and can hit authorized endpoints with access token in the loader level (optional)
 
 # done
+- create post
 - login/register pages for author and reader apps 
 - loading elements while fetching (kinda done)
 - refresh token wrapper frontend
@@ -26,7 +32,8 @@
 
 # planned
 - [for the next time]: 
-    - [6/11]
+    - [7/11] 
+    - [6/11] fix view post, add loading to dashboard and view post
     - [31/10] just finished custom hook to fetch posts display them and create form next I think 
 
 # targets
@@ -38,7 +45,8 @@
 - [29/10] refresh token wrapper frontend
 - [30/10] author app protected routes + register author + posts endpoints
 - [31/10] custom hook fetch all posts 
-- [31/10] author create post
+- [6/11] author create post
+- [7/11] view post and loading
 
 # takeaways
 - [19/10]:
@@ -87,4 +95,8 @@
     - functions called inside a useEffect that are in its dependency array and are not using useCallback will trigger effects to re-run - useCallback keeps the same function reference
     - useCallback refresh dependency array is empty because it the function implementation doesn't use state variable - module level import (authService), ref and state setters don't have to be included in the dependency array
     - when you use useCallback you got to respect the chain of functions, so it must be used when a function is in the dependency array of another useCallback
+- [6/11]:
+    - effects ran two times on StrictMode because React mounts, unmounts and mounts again the component - on unmount effects run cleanup
+    - inside map after => use () to indicate return
+- [7/11]:
 

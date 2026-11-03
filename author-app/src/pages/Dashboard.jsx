@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import { usePosts } from "../hooks/usePosts";
 import { useRef } from "react";
+import { useNavigate } from "react-router";
+
+import styles from "./Dashboard.module.css";
 
 export default function Dashboard() {
   const { getAuthorPosts } = usePosts();
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
   const controller = useRef(null);
 
   useEffect(() => {
@@ -13,10 +18,12 @@ export default function Dashboard() {
     const signal = controller.current.signal;
 
     async function getPosts() {
+      setLoading(true);
       const res = await getAuthorPosts(signal);
       if (res.aborted) return;
       if (res.ok) {
         setPosts([...res.posts]);
+        setLoading(false);
       } else {
         setError(new Error("Failed to load posts"));
       }
@@ -28,9 +35,17 @@ export default function Dashboard() {
     };
   }, [getAuthorPosts]);
 
-  console.log(posts);
+  const navigateToPost = (id) => {
+    navigate(`/post/${id}`);
+  };
+
+  const navigateToEditPost = (id) => {
+    navigate(`/edit/${id}`);
+  };
 
   if (error) throw error;
+
+  if (loading) return <></>;
 
   return (
     <>
@@ -39,11 +54,17 @@ export default function Dashboard() {
         {posts?.length > 0 ? (
           posts.map((post) => (
             <div key={post.id}>
-              <div>{post.title}</div>
+              <div
+                className={styles.postTitle}
+                onClick={() => navigateToPost(post.id)}
+              >
+                {post.title}
+              </div>
               <div>{post.body}</div>
               <div>{post.state}</div>
               <div>{post.createdAt}</div>
               <div>{post.updatedAt}</div>
+              <button onClick={() => navigateToEditPost(post.id)}>Edit</button>
             </div>
           ))
         ) : (

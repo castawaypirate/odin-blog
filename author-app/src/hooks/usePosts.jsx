@@ -8,9 +8,8 @@ export function usePosts() {
   const getAuthorPosts = useCallback(
     async (signal) => {
       try {
-        const response = await withRetry(
-          (options) => postsService.getAuthorPosts({ ...options, signal }),
-          // postsService.getAuthorPosts({ ...options }),
+        const response = await withRetry((options) =>
+          postsService.getAuthorPosts({ ...options, signal }),
         );
 
         if (response.ok) {
@@ -29,7 +28,93 @@ export function usePosts() {
     [withRetry],
   );
 
-  return { getAuthorPosts };
+  const getAuthorPost = useCallback(
+    async (param, signal) => {
+      try {
+        const response = await withRetry((options) =>
+          postsService.getAuthorPost(param, { ...options, signal }),
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          return { ok: true, post: result };
+        }
+
+        const status = response.status ?? response.refreshResponse.status;
+        return { ok: false, status };
+      } catch (err) {
+        if (err.name === "AbortError") return { ok: false, aborted: true };
+        console.error(err);
+        return { ok: false, status: 500 };
+      }
+    },
+    [withRetry],
+  );
+
+  const createPost = useCallback(
+    async (data) => {
+      try {
+        const response = await withRetry((options) =>
+          postsService.createPost(data, options),
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          return { ok: true, post: result };
+        }
+
+        const status = response.status ?? response.refreshResponse.status;
+        let createResponse;
+        if (response.refreshResponse) {
+          createResponse = response.refreshResponse;
+        } else {
+          createResponse = await response.json();
+        }
+        return { ok: false, status, response: createResponse };
+      } catch (err) {
+        console.error(err);
+        return {
+          ok: false,
+          response: [{ msg: "Something went wrong" }],
+        };
+      }
+    },
+    [withRetry],
+  );
+
+  const editPost = useCallback(
+    async (id, data) => {
+      try {
+        const response = await withRetry((options) =>
+          postsService.editPost(id, data, options),
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          return { ok: true, post: result };
+        }
+
+        const status = response.status ?? response.refreshResponse.status;
+        let editResponse;
+        if (response.refreshResponse) {
+          editResponse = response.refreshResponse;
+        } else {
+          // const text = await response.text();
+          editResponse = await response.json();
+        }
+        return { ok: false, status, response: editResponse };
+      } catch (err) {
+        console.error(err);
+        return {
+          ok: false,
+          response: [{ msg: "Something went wrong" }],
+        };
+      }
+    },
+    [withRetry],
+  );
+
+  return { getAuthorPosts, getAuthorPost, createPost, editPost };
 }
 
 // useEffect(() => {

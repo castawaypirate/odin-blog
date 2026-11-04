@@ -114,7 +114,38 @@ export function usePosts() {
     [withRetry],
   );
 
-  return { getAuthorPosts, getAuthorPost, createPost, editPost };
+  const deletePost = useCallback(
+    async (id) => {
+      try {
+        const response = await withRetry((options) =>
+          postsService.deletePost(id, options),
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          return { ok: true, post: result };
+        }
+
+        const status = response.status ?? response.refreshResponse.status;
+        let deleteResponse;
+        if (response.refreshResponse) {
+          deleteResponse = response.refreshResponse;
+        } else {
+          deleteResponse = await response.json();
+        }
+        return { ok: false, status, response: deleteResponse };
+      } catch (err) {
+        console.error(err);
+        return {
+          ok: false,
+          response: [{ msg: "Something went wrong" }],
+        };
+      }
+    },
+    [withRetry],
+  );
+
+  return { getAuthorPosts, getAuthorPost, createPost, editPost, deletePost };
 }
 
 // useEffect(() => {

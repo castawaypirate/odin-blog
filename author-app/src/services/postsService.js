@@ -20,6 +20,11 @@ class PostsService {
     const response = apiService.put(`/posts/${param}`, data, options);
     return response;
   }
+
+  deletePost(param, options) {
+    const response = apiService.delete(`/posts/${param}`, options);
+    return response;
+  }
 }
 
 export default new PostsService();

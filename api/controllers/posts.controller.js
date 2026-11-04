@@ -69,6 +69,38 @@ export const edit = [
   },
 ];
 
+export const remove = [
+  requireRole("Author"),
+  validatePostId,
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json(errors.array());
+    }
+
+    const postData = matchedData(req);
+
+    const postToDelete = await prisma.post.findUnique({
+      where: {
+        id: postData.id,
+        userId: req.user.id,
+      },
+    });
+
+    if (!postToDelete) {
+      return res.status(404).json({ msg: "Post not found" });
+    }
+
+    const deletedPost = await prisma.post.delete({
+      where: {
+        id: postData.id,
+      },
+    });
+
+    return res.json(deletedPost);
+  },
+];
+
 export const authorView = [
   requireRole("Author"),
   validatePostId,

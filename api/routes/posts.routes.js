@@ -4,6 +4,7 @@ import "../config/passport.js";
 import {
   create,
   edit,
+  remove,
   authorView,
   authorViewAll,
   view,
@@ -22,6 +23,12 @@ postsRouter.put(
   "/posts/:id",
   passport.authenticate("jwt", { session: false }),
   edit,
+);
+
+postsRouter.delete(
+  "/posts/:id",
+  passport.authenticate("jwt", { session: false }),
+  remove,
 );
 
 postsRouter.get(

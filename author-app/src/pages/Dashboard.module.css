@@ -5,3 +5,10 @@
 .postTitle:hover {
   cursor: pointer;
 }
+
+.checkboxGroup {
+  input:hover,
+  label:hover {
+    cursor: pointer;
+  }
+}

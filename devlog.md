@@ -1,18 +1,16 @@
 # backlog
-- author dashboard (view/edit/delete for each post)
-- filters in author dashboard to show posts with specific state or states
 - search in both dashboards
-- edit post (in edit mode you can change the state of the post)
 - post will have three states drafts, review, published ... so drafts will be only for the owner, review will be displayed to authors in reader app (maybe leave different kind of comments there) and published for all
 - author's comment carries a badge
 - comments (feedback) in review are shown only to authors in review page
 - reviewed button which can be pressed by authors to indicate that they reviewed the post - unreviewed posts in review page are styled differently - after author edits the post and updates review counter is zeroed and the post is shown again in review as unreviewed
 - comments on publish
 - cron job to clean up the expired refresh tokens
+- styles
 
 - don't forget helmet and rateLimit (for some reason)
+- handle usePosts errors better and find ways to test them
 - ask agent what did I not implement about refresh token (maybe this was about rotation)
-- styles
 
 - refresh token rotation + revoked field for refresh tokens (optional)
 - session id (meaning refresh token id) in the access token, checked per request (optional)
@@ -20,6 +18,9 @@
 - react app that uses context inside loaders and can hit authorized endpoints with access token in the loader level (optional)
 
 # done
+- filters in author dashboard to show posts with specific state or states
+- edit post (in edit mode you can change the state of the post)
+- author dashboard (view/edit/delete for each post)
 - create post
 - login/register pages for author and reader apps 
 - loading elements while fetching (kinda done)
@@ -31,7 +32,7 @@
 
 
 # planned
-- [for the next time]: 
+- [for the next time (below we have current dates)]: 
     - [7/11] 
     - [6/11] fix view post, add loading to dashboard and view post
     - [31/10] just finished custom hook to fetch posts display them and create form next I think 

@@ -81,6 +81,13 @@ export const login = [
 
     const loginData = matchedData(req);
 
+    if (
+      loginData.requireRole &&
+      loginData.requireRole !== process.env.AUTHOR_PARAM
+    ) {
+      return res.status(400).json([{ msg: "Bad request" }]);
+    }
+
     const user = await prisma.user.findUnique({
       where: { username: loginData.username },
     });
@@ -90,7 +97,6 @@ export const login = [
     }
 
     if (
-      loginData.requireRole &&
       loginData.requireRole === process.env.AUTHOR_PARAM &&
       user.role !== "Author"
     ) {
@@ -161,7 +167,7 @@ export const refresh = [
     try {
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
-        return res.status(200).json([{ msg: "No active session" }]);
+        return res.status(200).json({ accessToken: null });
       }
       const userRefreshToken = await prisma.refreshToken.findFirst({
         where: {

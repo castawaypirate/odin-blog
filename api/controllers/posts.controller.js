@@ -51,7 +51,7 @@ export const edit = [
     });
 
     if (!postToUpdate) {
-      return res.status(404).json({ msg: "Post not found" });
+      return res.status(404).json([{ msg: "Post not found" }]);
     }
 
     const updatedPost = await prisma.post.update({
@@ -88,7 +88,7 @@ export const remove = [
     });
 
     if (!postToDelete) {
-      return res.status(404).json({ msg: "Post not found" });
+      return res.status(404).json([{ msg: "Post not found" }]);
     }
 
     const deletedPost = await prisma.post.delete({
@@ -120,7 +120,7 @@ export const authorView = [
     });
 
     if (!post) {
-      return res.status(404).json({ msg: "Post not found" });
+      return res.status(404).json([{ msg: "Post not found" }]);
     }
 
     return res.json(post);
@@ -157,7 +157,7 @@ export const view = [
     });
 
     if (!post) {
-      return res.status(404).json({ msg: "Post not found" });
+      return res.status(404).json([{ msg: "Post not found" }]);
     }
 
     return res.json(post);

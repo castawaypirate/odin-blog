@@ -29,7 +29,11 @@ export default function Edit() {
         setFormData({ ...res.post });
         setLoading(false);
       } else {
-        setFetchingError(new Error("Failed to load post"));
+        if (res.status === 404) {
+          setFetchingError(new Error("Post not found"));
+        } else {
+          setFetchingError(new Error("Failed to load post"));
+        }
       }
     }
     getPost();
@@ -52,7 +56,7 @@ export default function Edit() {
       navigate("/", { replace: true });
       return;
     }
-    setErrors([...response.response]);
+    setErrors([...response.errors]);
     setUpdating(false);
   };
 
@@ -84,7 +88,6 @@ export default function Edit() {
         <div>
           <textarea
             onChange={handleChange}
-            type="text"
             name="body"
             id="body"
             placeholder="Body"
@@ -96,7 +99,7 @@ export default function Edit() {
           <select
             name="state"
             id="state"
-            defaultValue="Draft"
+            value={formData.state}
             onChange={handleChange}
           >
             <option value="Draft">Draft</option>

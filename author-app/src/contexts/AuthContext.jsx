@@ -7,6 +7,7 @@ import {
   useCallback,
 } from "react";
 import authService from "../services/authService";
+import { toErrors } from "../utils/errors";
 
 const AuthContext = createContext();
 
@@ -45,16 +46,17 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.refresh();
 
-      if (!response.ok) {
-        return { status: response.status, msg: "Something went wrong" };
-      } else {
+      if (response.ok) {
         const result = await response.json();
         if (!result.accessToken) {
-          return { status: 500, msg: "Internal server error" };
+          // api returns 200 with accessToken = null but we handle it as unathorized on the client
+          return { status: 401, msg: "No session" };
         }
         accessTokenRef.current = result.accessToken;
         return { status: 200 };
       }
+
+      return { status: response.status, msg: "Something went wrong" };
     } catch (err) {
       console.error(err);
       return { status: 500, msg: "Internal server error" };
@@ -98,11 +100,11 @@ export const AuthProvider = ({ children }) => {
         authService.getAuthor(options),
       );
 
-      if (!response.ok) {
-        console.log(response);
-      } else {
+      if (response.ok) {
         const result = await response.json();
         setUser(result);
+      } else {
+        console.warn(response);
       }
     } catch (err) {
       console.error(err);
@@ -113,20 +115,24 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (formData, setErrors) => {
     try {
-      formData["requireRole"] = import.meta.env.VITE_AUTHOR_PARAM;
-      const response = await authService.login(formData);
+      const response = await authService.login({
+        ...formData,
+        requireRole: import.meta.env.VITE_AUTHOR_PARAM,
+      });
 
-      if (!response.ok) {
-        const result = await response.json();
-        setErrors(result);
-        return false;
-      } else {
+      if (response.ok) {
         const result = await response.json();
         accessTokenRef.current = result.accessToken;
         return true;
       }
+
+      const result = await toErrors(response);
+      setErrors(result);
+      return false;
     } catch (err) {
       console.error(err);
+      setErrors([{ msg: "Something went wrong" }]);
+      return false;
     }
   };
 
@@ -134,17 +140,18 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.register(formData);
 
-      if (!response.ok) {
-        const result = await response.json();
-        setErrors(result);
-        return false;
-      } else {
+      if (response.ok) {
         const result = await response.json();
         accessTokenRef.current = result.accessToken;
         return true;
       }
+      const result = await toErrors(response);
+      setErrors(result);
+      return false;
     } catch (err) {
       console.error(err);
+      setErrors([{ msg: "Something went wrong" }]);
+      return false;
     }
   };
 

@@ -12,9 +12,10 @@ export default function Dashboard() {
     new Set(["Draft", "Review", "Publish"]),
   );
   const [posts, setPosts] = useState([]);
+  const [deletingId, setDeletingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [deletingErrors, setDeletingErrors] = useState([]);
+  const [deletingError, setDeletingError] = useState(null);
   const navigate = useNavigate();
   const controller = useRef(null);
 
@@ -79,12 +80,16 @@ export default function Dashboard() {
   };
 
   const handleDeletePost = async (id) => {
+    setDeletingId(id);
+    setDeletingError(null);
     const response = await deletePost(id);
-    if (!response.ok) {
-      setDeletingErrors([...response.response]);
-    } else {
-      setPosts([...posts.filter((x) => x.id !== id)]);
+    setDeletingId(null);
+    if (response.ok || response.status === 404) {
+      setPosts((prev) => prev.filter((p) => p.id !== id));
+      return;
     }
+
+    setDeletingError({ postId: id, errors: response.errors });
   };
 
   if (error) throw error;
@@ -149,12 +154,15 @@ export default function Dashboard() {
                     Edit
                   </button>
 
-                  {deletingErrors.length
-                    ? deletingErrors.map((error, index) => (
+                  {deletingError?.postId === post.id
+                    ? deletingError.errors.map((error, index) => (
                         <p key={index}>{error.msg}</p>
                       ))
                     : ""}
-                  <button onClick={() => handleDeletePost(post.id)}>
+                  <button
+                    disabled={deletingId === post.id}
+                    onClick={() => handleDeletePost(post.id)}
+                  >
                     Delete
                   </button>
                 </div>
@@ -167,37 +175,3 @@ export default function Dashboard() {
     </>
   );
 }
-
-// const [data, loading, error] = useFetch("/author/posts");
-// const { accessTokenRef } = useAuth();
-// const [data, setData] = useState(null);
-// const [loading, setLoading] = useState(true);
-// const [error, setError] = useState(null);
-//
-// useEffect(() => {
-//   const controller = new AbortController();
-//   async function fetchData() {
-//     console.log(accessTokenRef.current);
-//     try {
-//       // const response = await postsService.getAuthorPosts({});
-//       const response = await postsService.getAuthorPosts({
-//         headers: {
-//           Authorization: `Bearer ${accessTokenRef.current}`,
-//         },
-//       });
-//       console.log(response);
-//       const json = await response.json();
-//       console.log(json);
-//       setData(json);
-//     } catch (err) {
-//       // console.error(err);
-//       setError(err.msg);
-//     } finally {
-//       setLoading(false);
-//     }
-//   }
-//   fetchData();
-//   return () => controller.abort();
-// }, []);
-//
-// return <>{data && data.map((post) => <div>{post.title}</div>)}</>;

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { usePosts } from "../hooks/usePosts";
-import { useNavigate } from "react-router";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 export default function ViewPost() {
   const { getAuthorPost } = usePosts();
@@ -23,7 +22,11 @@ export default function ViewPost() {
         setPost(res.post);
         setLoading(false);
       } else {
-        setError(new Error("Failed to load post"));
+        if (res.status === 404) {
+          setError(new Error("Post not found"));
+        } else {
+          setError(new Error("Failed to load post"));
+        }
       }
     }
     getPost();
@@ -40,7 +43,7 @@ export default function ViewPost() {
   }
 
   return (
-    <div key={post?.id}>
+    <div>
       <h1>{post?.title}</h1>
       <p>{post?.body}</p>
       <div>{post?.state}</div>

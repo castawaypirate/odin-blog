@@ -27,7 +27,7 @@ export default function CreatePost() {
       navigate("/", { replace: true });
       return;
     }
-    setErrors([...response.response]);
+    setErrors([...response.errors]);
     setSubmitting(false);
   };
 
@@ -51,7 +51,6 @@ export default function CreatePost() {
         <div>
           <textarea
             onChange={handleChange}
-            type="text"
             name="body"
             id="body"
             placeholder="Body"
@@ -63,7 +62,7 @@ export default function CreatePost() {
           <select
             name="state"
             id="state"
-            defaultValue="Draft"
+            value={formData.state}
             onChange={handleChange}
           >
             <option value="Draft">Draft</option>

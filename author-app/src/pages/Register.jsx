@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function Register() {
   const { register, fetchAuthor } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -21,10 +22,19 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     if (await register(formData, setErrors)) {
       await fetchAuthor();
       navigate("/", { replace: true });
+      return;
     }
+    setSubmitting(false);
+    setFormData({
+      username: formData.username,
+      password: "",
+      confirm: "",
+      secret: "",
+    });
   };
 
   return (
@@ -74,7 +84,9 @@ export default function Register() {
             value={formData.secret}
           />
         </div>
-        <button type="submit">Register</button>
+        <button disabled={submitting} type="submit">
+          Register
+        </button>
       </form>
     </>
   );

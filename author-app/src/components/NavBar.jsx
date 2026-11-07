@@ -32,7 +32,10 @@ export default function NavBar() {
         ) : (
           <>
             {user ? (
-              <NavLink onClick={handleLogout}>Logout</NavLink>
+              <>
+                <span>{user.username}</span>
+                <NavLink onClick={handleLogout}>Logout</NavLink>
+              </>
             ) : (
               <>
                 <NavLink to="/login">Login</NavLink>

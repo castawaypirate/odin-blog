@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 
 export default function Login() {
   const { login, fetchAuthor } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -19,11 +20,13 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     if (await login(formData, setErrors)) {
       await fetchAuthor();
       navigate("/", { replace: true });
       return;
     }
+    setSubmitting(false);
     setFormData({ username: formData.username, password: "" });
   };
 
@@ -54,7 +57,9 @@ export default function Login() {
             value={formData.password}
           />
         </div>
-        <button type="submit">Login</button>
+        <button disabled={submitting} type="submit">
+          Login
+        </button>
       </form>
     </>
   );

@@ -1,5 +1,13 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import authService from "../services/authService";
+import { toErrors } from "../utils/errors";
 
 const AuthContext = createContext();
 
@@ -10,153 +18,118 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within an AuthProvider");
   }
 
-  const { user, fetchUser, login, register, logout, loading } = context;
+  const { withRetry, user, fetchUser, login, register, logout, loading } =
+    context;
 
   const isAuthorized = (requireRole) => {
     return user && user.role === requireRole;
   };
 
-  return { user, fetchUser, login, register, logout, loading, isAuthorized };
+  return {
+    withRetry,
+    user,
+    fetchUser,
+    login,
+    register,
+    logout,
+    loading,
+    isAuthorized,
+  };
 };
 
 export const AuthProvider = ({ children }) => {
-  // const [accessToken, setAccessToken] = useState();
   let accessTokenRef = useRef(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  async function withRetry(doRequest) {
-    const response = await doRequest();
-    if (response.status !== 401) return response;
-    const refreshResponse = await refresh();
-    if (refreshResponse.status === 401) {
-      setUser(null);
-      return { ok: false, refreshResponse };
-    } else if (refreshResponse.status === 500) {
-      return { ok: false, refreshResponse };
-    } else {
-      return doRequest();
-    }
-  }
-
-  const fetchUser = async () => {
+  const refresh = useCallback(async () => {
     try {
-      setLoading(true);
-      // const response = await authService.getUser({
-      //   headers: {
-      //     Authorization: `Bearer ${accessTokenRef.current}`,
-      //   },
-      // });
-
-      const response = await withRetry(() =>
-        authService.getUser({
-          headers: {
-            Authorization: `Bearer ${accessTokenRef.current}`,
-          },
-        }),
-      );
-
-      if (!response.ok) {
-        // const result = await response.text();
-        // console.log(result);
-        console.log(response);
-      } else {
-        const result = await response.json();
-        console.log(result);
-        setUser(result);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // const fetchUser = async () => {
-  //   try {
-  //     // const response = await fetch("http://localhost:8000/me", {
-  //     //   method: "GET",
-  //     //   headers: {
-  //     //     "Content-Type": "application/json",
-  //     //     Authorization: `Bearer ${accessTokenRef.current}`,
-  //     //   },
-  //     //   credentials: "include",
-  //     // });
-  //
-  //     const response = await authService.getUser({
-  //       headers: {
-  //         Authorization: `Bearer ${accessTokenRef.current}`,
-  //       },
-  //     });
-  //
-  //     if (!response.ok) {
-  //       const result = await response.text();
-  //       console.log(result);
-  //       setUser(null);
-  //     } else {
-  //       const result = await response.json();
-  //       console.log(result);
-  //       setUser(result);
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-
-  async function refresh() {
-    try {
-      // const response = await fetch("http://localhost:8000/refresh", {
-      //   method: "POST",
-      //   credentials: "include",
-      // });
-
       const response = await authService.refresh();
 
-      if (!response.ok) {
-        // const result = await response.json();
-        return { status: response.status };
-      } else {
+      if (response.ok) {
         const result = await response.json();
         if (!result.accessToken) {
-          return { status: 500 };
+          // api returns 200 with accessToken = null but we handle it as unathorized on the client
+          return { status: 401, msg: "No session" };
         }
-        // setAccessToken(result.accessToken);
         accessTokenRef.current = result.accessToken;
         return { status: 200 };
       }
+
+      return { status: response.status, msg: "Something went wrong" };
     } catch (err) {
       console.error(err);
-      return { status: 500 };
+      return { status: 500, msg: "Internal server error" };
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  const login = async (formData, setErrors) => {
-    try {
-      // const response = await fetch("http://localhost:8000/login", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   credentials: "include",
-      //   body: JSON.stringify(formData),
-      // });
+  const withRetry = useCallback(
+    async (doRequest) => {
+      const response = await doRequest({
+        headers: {
+          Authorization: `Bearer ${accessTokenRef.current}`,
+        },
+      });
+      if (response.status !== 401) return response;
 
-      const response = await authService.login(formData);
-
-      if (!response.ok) {
-        const result = await response.json();
-        setErrors(result);
-        return false;
+      const refreshResponse = await refresh();
+      if (refreshResponse.status === 401) {
+        setUser(null);
+        accessTokenRef.current = null;
+        return { ok: false, refreshResponse };
+      } else if (refreshResponse.status === 500) {
+        return { ok: false, refreshResponse };
       } else {
+        return await doRequest({
+          headers: {
+            Authorization: `Bearer ${accessTokenRef.current}`,
+          },
+        });
+      }
+    },
+    [refresh],
+  );
+
+  const fetchUser = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const response = await withRetry((options) =>
+        authService.getUser(options),
+      );
+
+      if (response.ok) {
         const result = await response.json();
-        // setAccessToken(result.accessToken);
-        accessTokenRef.current = result.accessToken;
-        return true;
+        setUser(result);
+      } else {
+        console.warn(response);
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [withRetry]);
+
+  const login = async (formData, setErrors) => {
+    try {
+      const response = await authService.login(formData);
+
+      if (response.ok) {
+        const result = await response.json();
+        accessTokenRef.current = result.accessToken;
+        return true;
+      }
+
+      const result = await toErrors(response);
+      setErrors(result);
+      return false;
+    } catch (err) {
+      console.error(err);
+      setErrors([{ msg: "Something went wrong" }]);
+      return false;
     }
   };
 
@@ -164,31 +137,24 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.register(formData);
 
-      if (!response.ok) {
-        const result = await response.json();
-        setErrors(result);
-        return false;
-      } else {
+      if (response.ok) {
         const result = await response.json();
         accessTokenRef.current = result.accessToken;
         return true;
       }
+      const result = await toErrors(response);
+      setErrors(result);
+      return false;
     } catch (err) {
       console.error(err);
+      setErrors([{ msg: "Something went wrong" }]);
+      return false;
     }
   };
 
   const logout = async () => {
     let success = false;
     try {
-      // const response = await fetch("http://localhost:8000/logout", {
-      //   headers: {
-      //     Authorization: `Bearer ${accessTokenRef.current}`,
-      //   },
-      //   method: "POST",
-      //   credentials: "include",
-      // });
-
       const response = await authService.logout({
         headers: {
           Authorization: `Bearer ${accessTokenRef.current}`,
@@ -211,7 +177,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // const controller = new AbortController();
     async function init() {
       if (accessTokenRef.current) {
         await fetchUser();
@@ -224,15 +189,20 @@ export const AuthProvider = ({ children }) => {
       }
     }
     init();
-    // return () => controller.abort();
-  }, []);
+  }, [fetchUser, refresh]);
 
   return (
-    // <AuthContext value={[user, setUser, accessToken, setAccessToken]}>
-    //   {children}
-    // </AuthContext>
-
-    <AuthContext value={{ user, fetchUser, login, register, logout, loading }}>
+    <AuthContext
+      value={{
+        withRetry,
+        user,
+        fetchUser,
+        login,
+        register,
+        logout,
+        loading,
+      }}
+    >
       {children}
     </AuthContext>
   );

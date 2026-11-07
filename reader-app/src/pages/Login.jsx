@@ -1,13 +1,10 @@
 import { useState } from "react";
-// import { useContext, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
-// import { AuthContext, useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
-  // const [accessToken, setAccessToken] = useContext(AuthContext);
-  // const { login, fetchUser } = useContext(AuthContext);
   const { login, fetchUser } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -23,10 +20,14 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     if (await login(formData, setErrors)) {
       await fetchUser();
       navigate("/", { replace: true });
+      return;
     }
+    setSubmitting(false);
+    setFormData({ username: formData.username, password: "" });
   };
 
   return (
@@ -56,7 +57,9 @@ export default function Login() {
             value={formData.password}
           />
         </div>
-        <button type="submit">Login</button>
+        <button disabled={submitting} type="submit">
+          Login
+        </button>
       </form>
     </>
   );

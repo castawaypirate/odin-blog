@@ -1,6 +1,5 @@
 class ApiService {
   constructor() {
-    // this.baseURL = import.meta.env.VITE_API_BASE_URL;
     this.baseURL = "/api";
   }
 
@@ -15,29 +14,9 @@ class ApiService {
       },
     };
 
-    // try {
     const response = await fetch(url, config);
 
-    // if (response.status === 401) {
-    //   const refreshSuccess = await this.refreshToken();
-    //
-    //   if (refreshSuccess) {
-    //     return this.request(url, options);
-    //   } else {
-    //     window.location.href = "/login";
-    //     throw new Error("Authentication required");
-    //   }
-    // }
-    //
-    // if (!response.ok) {
-    //   throw new Error(`HTTP error! Status: ${response.status}`);
-    // }
-
     return response;
-
-    // } catch (error) {
-    //   throw error;
-    // }
   }
 
   get(endpoint, options = {}) {

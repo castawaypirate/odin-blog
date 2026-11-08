@@ -17,7 +17,7 @@ import AuthorRoute from "./components/guards/AuthorRoute";
 //       method: "GET",
 //       headers: {
 //         "Content-Type": "application/json",
-//         Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNlMmE4ZWY4LWJlZjQtNDM5MC1iMjVmLTM1MDBkZjk0NWQ1YiIsImlhdCI6MTc5MjU4NTMxOCwiZXhwIjoxNzkyNTg1NjE4fQ.HYimfCHpJeX5jdcw-O0zl9jxlqFe37akCHUwo0BMtj4`,
+//         Authorization: `Bearer ...`,
 //       },
 //       credentials: "include",
 //     });
@@ -59,7 +59,6 @@ const routes = [
             <PostsReview />
           </AuthorRoute>
         ),
-
         // loader: userLoader,
       },
       {

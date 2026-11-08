@@ -10,10 +10,6 @@ function App() {
       <NavBar />
       <Outlet />
     </AuthProvider>
-    // <>
-    //   <NavBar />
-    //   <Outlet />
-    // </>
   );
 }
 

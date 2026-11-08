@@ -33,7 +33,7 @@
 
 # planned
 - [for the next time (below we have current dates)]: 
-    - [7/11] 
+    - [7/11] get published posts on reader home page and review articles on review page and start comments for review first
     - [6/11] fix view post, add loading to dashboard and view post
     - [31/10] just finished custom hook to fetch posts display them and create form next I think 
 
@@ -100,4 +100,6 @@
     - effects ran two times on StrictMode because React mounts, unmounts and mounts again the component - on unmount effects run cleanup
     - inside map after => use () to indicate return
 - [7/11]:
+    - put string or numbers in dependency arrays instead of objects (params vs id)
+    - we use abort controller in the the useEffects that run on components that mount and unmount many times after application startup like pages or other componenets that are used often - no abort to auth provider useEffect because it mounts once on application startup
 

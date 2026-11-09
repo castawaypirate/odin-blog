@@ -20,6 +20,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors([]);
     setSubmitting(true);
     if (await login(formData, setErrors)) {
       await fetchUser();

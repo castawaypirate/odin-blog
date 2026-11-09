@@ -21,6 +21,7 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors([]);
     setSubmitting(true);
     if (await register(formData, setErrors)) {
       await fetchUser();

@@ -60,8 +60,6 @@ export const AuthProvider = ({ children }) => {
     } catch (err) {
       console.error(err);
       return { status: 500, msg: "Internal server error" };
-    } finally {
-      setLoading(false);
     }
   }, []);
 
@@ -82,11 +80,16 @@ export const AuthProvider = ({ children }) => {
       } else if (refreshResponse.status === 500) {
         return { ok: false, refreshResponse };
       } else {
-        return await doRequest({
+        const retried = await doRequest({
           headers: {
             Authorization: `Bearer ${accessTokenRef.current}`,
           },
         });
+        if (retried.status === 401) {
+          setUser(null);
+          accessTokenRef.current = null;
+        }
+        return retried;
       }
     },
     [refresh],
@@ -178,14 +181,18 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     async function init() {
-      if (accessTokenRef.current) {
-        await fetchUser();
-      } else {
-        // we need this to not get 401 on page load/reload
-        const refreshResponse = await refresh();
-        if (refreshResponse.status === 200) {
+      try {
+        if (accessTokenRef.current) {
           await fetchUser();
+        } else {
+          // we need this to not get 401 on page load/reload
+          const refreshResponse = await refresh();
+          if (refreshResponse.status === 200) {
+            await fetchUser();
+          }
         }
+      } finally {
+        setLoading(false);
       }
     }
     init();

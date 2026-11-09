@@ -34,7 +34,8 @@ export default function NavBar() {
             {user ? (
               <>
                 <span>{user.username}</span>
-                <NavLink onClick={handleLogout}>Logout</NavLink>
+                {/* <NavLink onClick={handleLogout}>Logout</NavLink> */}
+                <button onClick={handleLogout}>Logout</button>
               </>
             ) : (
               <>

@@ -50,12 +50,8 @@ export default function Dashboard() {
       return true;
     }
     if (
-      title
-        .toLowerCase()
-        .includes(
-          search.toLowerCase() ||
-            body.toLowerCase().includes(search.toLowerCase()),
-        )
+      title.toLowerCase().includes(search.toLowerCase()) ||
+      body.toLowerCase().includes(search.toLowerCase())
     ) {
       return true;
     }

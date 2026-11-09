@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { usePosts } from "../hooks/usePosts";
 
-export default function Edit() {
+export default function EditPost() {
   const { getAuthorPost, editPost } = usePosts();
   const [updating, setUpdating] = useState(false);
   const [loading, setLoading] = useState(true);

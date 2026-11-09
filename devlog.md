@@ -9,7 +9,6 @@
 - styles
 
 - don't forget helmet and rateLimit (for some reason)
-- handle usePosts errors better and find ways to test them
 - ask agent what did I not implement about refresh token (maybe this was about rotation)
 
 - refresh token rotation + revoked field for refresh tokens (optional)
@@ -18,6 +17,7 @@
 - react app that uses context inside loaders and can hit authorized endpoints with access token in the loader level (optional)
 
 # done
+- handle usePosts errors better and find ways to test them
 - filters in author dashboard to show posts with specific state or states
 - edit post (in edit mode you can change the state of the post)
 - author dashboard (view/edit/delete for each post)
@@ -33,6 +33,7 @@
 
 # planned
 - [for the next time (below we have current dates)]: 
+    - [8/11] whatever [7/11] has on, also start with opencode findings
     - [7/11] get published posts on reader home page and review articles on review page and start comments for review first
     - [6/11] fix view post, add loading to dashboard and view post
     - [31/10] just finished custom hook to fetch posts display them and create form next I think 
@@ -48,6 +49,7 @@
 - [31/10] custom hook fetch all posts 
 - [6/11] author create post
 - [7/11] view post and loading
+- [8/11] error handling
 
 # takeaways
 - [19/10]:
@@ -102,4 +104,5 @@
 - [7/11]:
     - put string or numbers in dependency arrays instead of objects (params vs id)
     - we use abort controller in the the useEffects that run on components that mount and unmount many times after application startup like pages or other componenets that are used often - no abort to auth provider useEffect because it mounts once on application startup
-
+- [8/11]: 
+    

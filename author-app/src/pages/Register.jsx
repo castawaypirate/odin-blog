@@ -24,7 +24,9 @@ export default function Register() {
     e.preventDefault();
     setErrors([]);
     setSubmitting(true);
-    if (await register(formData, setErrors)) {
+    if (!formData.secret) {
+      setErrors([{ msg: "Secret cannot be empty" }]);
+    } else if (await register(formData, setErrors)) {
       await fetchAuthor();
       navigate("/", { replace: true });
       return;

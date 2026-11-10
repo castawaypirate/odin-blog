@@ -142,7 +142,7 @@ export default function Dashboard() {
                   >
                     {post.title}
                   </div>
-                  <div>{post.body}</div>
+                  {/* <div>{post.body}</div> */}
                   <div>{post.state}</div>
                   <div>{post.createdAt}</div>
                   <div>{post.updatedAt}</div>

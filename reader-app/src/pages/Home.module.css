@@ -1,0 +1,7 @@
+.postTitle {
+  width: fit-content;
+}
+
+.postTitle:hover {
+  cursor: pointer;
+}

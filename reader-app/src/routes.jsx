@@ -1,10 +1,12 @@
 import App from "./App";
 import Home from "./pages/Home";
+import ViewPost from "./pages/ViewPost";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Error from "./pages/Error";
 import PublicOnlyRoute from "./components/guards/PublicOnlyRoute";
-import PostsReview from "./pages/PostsReview";
+import ReviewPosts from "./pages/ReviewPosts";
+import ReviewPost from "./pages/ReviewPost";
 import AuthorRoute from "./components/guards/AuthorRoute";
 
 // import { createContext } from "react-router";
@@ -56,10 +58,21 @@ const routes = [
         path: "/review",
         element: (
           <AuthorRoute>
-            <PostsReview />
+            <ReviewPosts />
           </AuthorRoute>
         ),
-        // loader: userLoader,
+      },
+      {
+        path: "/review/:id",
+        element: (
+          <AuthorRoute>
+            <ReviewPost />
+          </AuthorRoute>
+        ),
+      },
+      {
+        path: "/post/:id",
+        element: <ViewPost />,
       },
       {
         path: "/login",

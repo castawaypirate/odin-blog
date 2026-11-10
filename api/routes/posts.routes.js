@@ -7,6 +7,8 @@ import {
   remove,
   authorView,
   authorViewAll,
+  authorViewReviewPost,
+  authorViewReviewPosts,
   view,
   viewAll,
 } from "../controllers/posts.controller.js";
@@ -20,19 +22,19 @@ postsRouter.post(
 );
 
 postsRouter.put(
-  "/posts/:id",
+  "/posts/:postId",
   passport.authenticate("jwt", { session: false }),
   edit,
 );
 
 postsRouter.delete(
-  "/posts/:id",
+  "/posts/:postId",
   passport.authenticate("jwt", { session: false }),
   remove,
 );
 
 postsRouter.get(
-  "/author/posts/:id",
+  "/author/posts/:postId",
   passport.authenticate("jwt", { session: false }),
   authorView,
 );
@@ -43,7 +45,19 @@ postsRouter.get(
   authorViewAll,
 );
 
-postsRouter.get("/posts/:id", view);
+postsRouter.get(
+  "/review/posts/:postId",
+  passport.authenticate("jwt", { session: false }),
+  authorViewReviewPost,
+);
+
+postsRouter.get(
+  "/review/posts",
+  passport.authenticate("jwt", { session: false }),
+  authorViewReviewPosts,
+);
+
+postsRouter.get("/posts/:postId", view);
 
 postsRouter.get("/posts", viewAll);
 

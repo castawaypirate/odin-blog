@@ -49,3 +49,18 @@ export const validatePost = [
 export const validatePostId = [
   param("postId").isUUID().withMessage("Invalid post id"),
 ];
+
+export const validateComment = [
+  body("body").trim().notEmpty().withMessage("Comment cannot be empty"),
+  body("review")
+    .exists()
+    .withMessage("Review is required")
+    .bail()
+    .isBoolean()
+    .withMessage("Review must be true or false")
+    .toBoolean(),
+];
+
+export const validateCommentId = [
+  param("commentId").isUUID().withMessage("Invalid comment id"),
+];

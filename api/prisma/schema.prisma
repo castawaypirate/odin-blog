@@ -30,6 +30,7 @@ model User {
   role          UserRole
   refreshTokens RefreshToken[]
   posts         Post[]
+  comments      Comment[]
 
   @@map("users")
 }
@@ -54,8 +55,23 @@ model Post {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
   publishedAt DateTime? @map("published_at")
+  comments    Comment[]
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String    @map("user_id")
 
   @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  body      String
+  review    Boolean
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String   @map("post_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @map("user_id")
+
+  @@map("comments")
 }

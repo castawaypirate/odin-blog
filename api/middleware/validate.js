@@ -39,7 +39,7 @@ export const validateLogin = [
 
 export const validatePost = [
   body("title").trim().notEmpty().withMessage("Title cannot be empty"),
-  body("body").notEmpty().withMessage("Body cannot be empty"),
+  body("body").trim().notEmpty().withMessage("Body cannot be empty"),
   body("state")
     .notEmpty()
     .withMessage("State cannot be empty")
@@ -47,5 +47,5 @@ export const validatePost = [
 ];
 
 export const validatePostId = [
-  param("id").isUUID().withMessage("Invalid post id"),
+  param("postId").isUUID().withMessage("Invalid post id"),
 ];
